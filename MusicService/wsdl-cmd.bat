@@ -1,0 +1,1 @@
+START C:\axis2-1.7.9\bin\WSDL2Java.bat -uri -s -ss -sd -uri Service.wsdl

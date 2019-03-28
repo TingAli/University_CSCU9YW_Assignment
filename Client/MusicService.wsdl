@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions name="MusicDefinitions" targetNamespace="urn:Music" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:music="urn:Music" xmlns:wsaw="https://www.w3.org/2006/05/addressing/wsdl" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+  <types>
+    <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="urn:Music" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:music="urn:Music">
+			<!-- Track Detail -->
+			<complexType name="TrackDetail">
+				<sequence>
+					<element name="id" nillable="false" type="int"/>
+					<element name="DiscNumber" nillable="true" type="int"/>
+					<element name="TrackNumber" nillable="true" type="int"/>
+					<element name="ComposerName" nillable="true" type="string"/>
+					<element name="WorkName" nillable="true" type="string"/>
+					<element name="TitleName" nillable="true" type="string"/>
+				</sequence>
+			</complexType>
+			<!-- TrackDetails -->
+			<complexType name="TrackDetails">
+				<sequence>
+					<element maxOccurs="unbounded" minOccurs="0" name="TrackDetail" nillable="false" type="music:TrackDetail"/>
+				</sequence>
+			</complexType>
+			<element name="Track" nillable="true" type="music:TrackDetail"/>
+			<element name="Tracks" nillable="true" type="music:TrackDetails"/>
+			<element name="ComposerName" nillable="false" type="string"/>
+			<element name="DiscNumber" nillable="false" type="int"/>
+			<element name="ErrorMessage" nillable="true" type="string"/>
+		</xs:schema>
+  </types>
+  <message name="GetByDiscMessage">
+    <part name="parameters" element="music:DiscNumber">
+    </part>
+  </message>
+  <message name="ResultMessage">
+    <part name="return" element="music:Tracks">
+    </part>
+  </message>
+  <message name="GetByComposerMessage">
+    <part name="parameters" element="music:ComposerName">
+    </part>
+  </message>
+  <message name="ErrorFault">
+    <part name="return" element="music:ErrorMessage">
+    </part>
+  </message>
+  <portType name="MusicPort">
+    <operation name="GetByComposer">
+<documentation>
+				This operation takes part of the name for a
+				composer/artist, and returns a list of track details whose
+				composer/artist contains the given string. An &quot;errorFault&quot; is
+				thrown
+				if the name is empty or does not match.
+			</documentation>
+      <input message="music:GetByComposerMessage" wsaw:Action="music:ComposerName">
+    </input>
+      <output message="music:ResultMessage" wsaw:Action="music:Tracks">
+    </output>
+      <fault name="ErrorFault" message="music:ErrorFault" wsaw:Action="music:ErrorMessage">
+    </fault>
+    </operation>
+    <operation name="GetByDisc">
+<documentation>
+				This operation takes the number of a disc, and returns
+				a list of track details for this disc. An &quot;errorFault&quot; is thrown if
+				the
+				disc number is invalid or does not match.
+			</documentation>
+      <input message="music:GetByDiscMessage" wsaw:Action="music:DiscNumber">
+    </input>
+      <output message="music:ResultMessage" wsaw:Action="music:Tracks">
+    </output>
+      <fault name="ErrorFault" message="music:ErrorFault" wsaw:Action="music:ErrorMessage">
+    </fault>
+    </operation>
+  </portType>
+  <binding name="MusicBinding" type="music:MusicPort">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <operation name="GetByComposer">
+      <soap:operation soapAction="http://127.0.0.1:8084/axis2/services/MusicService/GetByComposer"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="ErrorFault">
+        <soap:fault use="literal"/>
+      </fault>
+    </operation>
+    <operation name="GetByDisc">
+      <soap:operation soapAction="http://127.0.0.1:8084/axis2/services/MusicService/GetByDisc"/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+      <fault name="ErrorFault">
+        <soap:fault use="literal"/>
+      </fault>
+    </operation>
+  </binding>
+  <service name="MusicService">
+<documentation>The client can remotely enquire about music items by
+			composer/artist name or by disc number. The server responds to
+			queries with reference to the music database.
+		</documentation>
+    <port name="MusicPort" binding="music:MusicBinding">
+      <soap:address location="http://127.0.0.1:8084/axis2/services/MusicService"/>
+    </port>
+  </service>
+</definitions>
